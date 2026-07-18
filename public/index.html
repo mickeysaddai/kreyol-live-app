@@ -62,18 +62,19 @@
   #chunkInfo{ font-size:11px; color:var(--muted); }
 
   #stage{
-    flex:1; overflow-y:auto; padding:20px 4px 12px 4px;
-    display:flex; flex-direction:column; gap:18px;
+    flex:1; overflow-y:auto; padding:16px 4px 12px 4px;
+    display:flex; flex-direction:column; gap:12px;
   }
   .caption{ animation:fadein 0.35s ease-out; }
   @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
-  .caption .meta{ display:flex; gap:10px; align-items:baseline; margin-bottom:6px; }
-  .caption .time{ font-size:11px; color:var(--signal); letter-spacing:0.05em; }
-  .caption .tag{ font-size:11px; color:var(--muted); letter-spacing:0.05em; }
-  .caption .en{ font-size:22px; line-height:1.35; font-weight:600; color:var(--paper); }
+  .caption .meta{ display:flex; gap:10px; align-items:baseline; margin-bottom:3px; }
+  .caption .time{ font-size:10px; color:var(--signal); letter-spacing:0.05em; }
+  .caption .tag{ font-size:10px; color:var(--muted); letter-spacing:0.05em; }
+  .caption .en{ font-size:16px; line-height:1.32; font-weight:600; color:var(--paper); }
   .caption .en.pending{ color:var(--muted); font-weight:500; font-style:italic; }
-  .caption .en.failed{ color:var(--alert); font-weight:500; font-size:15px; }
-  .caption .ht{ margin-top:6px; font-size:13px; color:var(--muted); font-style:italic; line-height:1.4; }
+  .caption .en.failed{ color:var(--alert); font-weight:500; font-size:13px; }
+  .caption .ht{ margin-top:3px; font-size:12px; color:var(--muted); font-style:italic; line-height:1.35; }
+  .caption .ht:not(:empty)::before{ content:"kreyòl: "; font-style:normal; opacity:0.7; }
 
   #empty{ margin:auto; text-align:center; color:var(--muted); padding:0 20px; }
   #empty .big{ font-size:16px; color:var(--paper); margin-bottom:8px; font-weight:600; }
@@ -101,7 +102,7 @@
 
   <div id="controls">
     <button id="toggle">Start Listening</button>
-    <span id="chunkInfo" class="mono">~10s chunks</span>
+    <span id="chunkInfo" class="mono">~5s chunks</span>
   </div>
 
   <div id="banner"></div>
@@ -111,7 +112,7 @@
       <div class="big">Ready when you are</div>
       <div class="small">
         Tap <strong>Start Listening</strong> and hold your phone toward the speaker.
-        Each ~10 second chunk gets transcribed and translated, and appears here as it's ready.
+        Each ~5 second chunk gets translated and appears here as it's ready.
       </div>
     </div>
   </div>
@@ -127,8 +128,8 @@
   const statusText = document.getElementById('statusText');
   const banner = document.getElementById('banner');
 
-  const CHUNK_MS = 10000;
-  const OVERLAP_MS = 400; // next recorder starts this long before the current one stops, so no audio is ever missed
+  const CHUNK_MS = 5000;
+  const OVERLAP_MS = 300; // next recorder starts this long before the current one stops, so no audio is ever missed
 
   let mediaStream = null;
   let currentRecorder = null;
