@@ -129,8 +129,6 @@
 
   const CHUNK_MS = 10000;
   const OVERLAP_MS = 400; // next recorder starts this long before the current one stops, so no audio is ever missed
-  const POLL_MS = 1500;
-  const MAX_POLLS = 20; // ~30s ceiling per chunk before giving up
 
   let mediaStream = null;
   let currentRecorder = null;
@@ -167,7 +165,7 @@
     wrap.innerHTML = `
       <div class="meta">
         <span class="time mono">${fmtTime()}</span>
-        <span class="tag mono">transcribing…</span>
+        <span class="tag mono">translating…</span>
       </div>
       <div class="en pending">…</div>
       <div class="ht"></div>
@@ -212,53 +210,20 @@
     try{
       const base64 = await blobToBase64(blob);
 
-      const startRes = await fetch('/.netlify/functions/start-transcription', {
+      const res = await fetch('/.netlify/functions/translate-chunk', {
         method: 'POST',
         headers: {'content-type': 'application/json'},
         body: JSON.stringify({ audio: base64, mime: blob.type })
       });
-      const startData = await startRes.json();
-      if(!startRes.ok) throw new Error(startData.error || 'Could not start transcription');
-      const id = startData.id;
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.error || 'Request failed');
 
-      let creoleText = '';
-      let gotResult = false;
-      for(let i = 0; i < MAX_POLLS; i++){
-        await sleep(POLL_MS);
-        const statusRes = await fetch('/.netlify/functions/transcript-status?id=' + encodeURIComponent(id));
-        const statusData = await statusRes.json();
-        if(statusData.status === 'completed'){
-          creoleText = statusData.text || '';
-          gotResult = true;
-          break;
-        }
-        if(statusData.status === 'error'){
-          throw new Error(statusData.error || 'Transcription error');
-        }
-      }
-      if(!gotResult){ throw new Error('Transcription timed out'); }
-
-      if(!creoleText.trim()){
+      if(!data.english || data.english === '[inaudible]'){
         removeCaption(captionEl);
         return;
       }
 
-      captionEl.querySelector('.tag').textContent = 'translating…';
-
-      const translateRes = await fetch('/.netlify/functions/translate', {
-        method: 'POST',
-        headers: {'content-type': 'application/json'},
-        body: JSON.stringify({ text: creoleText })
-      });
-      const translateData = await translateRes.json();
-      if(!translateRes.ok) throw new Error(translateData.error || 'Translation failed');
-
-      if(translateData.english === '[inaudible]'){
-        removeCaption(captionEl);
-        return;
-      }
-
-      fillCaption(captionEl, translateData.english, creoleText);
+      fillCaption(captionEl, data.english, data.creole || '');
       hideBanner();
     }catch(err){
       failCaption(captionEl, err.message);
