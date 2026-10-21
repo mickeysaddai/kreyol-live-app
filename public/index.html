@@ -102,7 +102,7 @@
 
   <div id="controls">
     <button id="toggle">Start Listening</button>
-    <span id="chunkInfo" class="mono">~5s chunks</span>
+    <span id="chunkInfo" class="mono">~10s chunks</span>
   </div>
 
   <div id="banner"></div>
@@ -112,7 +112,7 @@
       <div class="big">Ready when you are</div>
       <div class="small">
         Tap <strong>Start Listening</strong> and hold your phone toward the speaker.
-        Each ~5 second chunk gets translated and appears here as it's ready.
+        Each ~10 second chunk gets translated and appears here as it's ready.
       </div>
     </div>
   </div>
@@ -128,7 +128,7 @@
   const statusText = document.getElementById('statusText');
   const banner = document.getElementById('banner');
 
-  const CHUNK_MS = 5000;
+  const CHUNK_MS = 10000;
   const OVERLAP_MS = 300; // next recorder starts this long before the current one stops, so no audio is ever missed
 
   let mediaStream = null;
